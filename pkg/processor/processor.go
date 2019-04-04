@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"log"
 
-	"gitlab.com/Beamery/DevOps/beambot/pkg/server"
+	"github.com/leangeder/chatops2/pkg/server"
+	"github.com/leangeder/chatops2/pkg/slack"
 )
 
 type actionPayload struct {
@@ -30,7 +31,7 @@ func (s *server.Server) buildProcessor() {
 	for build := range s.Builds {
 		go func() {
 
-			ts, attemptErr := sendAttemptDeployMessage(build)
+			ts, attemptErr := AttemptDeployMessage(build)
 			if attemptErr != nil {
 				log.Println(attemptErr)
 				return
@@ -41,26 +42,26 @@ func (s *server.Server) buildProcessor() {
 			if deployErr != nil {
 				log.Println(deployErr)
 
-				failErr := sendFailedDeployMessage(build, ts, deployErr)
+				failErr := FailedDeployMessage(build, ts, deployErr)
 				if failErr != nil {
 					log.Println(failErr)
 				}
 				return
 			}
 
-			err := sendDeploySuccessMessage(build, ts, url)
+			err := DeploySuccessMessage(build, ts, url)
 			if err != nil {
 				log.Println(err)
 				return
 			}
 
-			payload, errs := sendOwnerMessages(build, url)
+			payload, errs := OwnerMessages(build, url)
 			if len(errs) > 0 {
 				log.Println(errs)
 				return
 			}
 
-			errs = sendQaMessages(build, url, payload)
+			errs = QaMessages(build, url, payload)
 			if len(errs) > 0 {
 				log.Println(errs)
 				return
@@ -83,7 +84,7 @@ func (s *server.Server) interactionProcessor() {
 	}
 }
 
-func handleQaResponse(action SlackInteraction) {
+func handleQaResponse(action slack.SlackInteraction) {
 
 	user := action.User["id"]
 	channel := action.Channel["id"]
@@ -95,17 +96,17 @@ func handleQaResponse(action SlackInteraction) {
 		return
 	}
 
-	var newAttch SlackAttachment
+	var newAttch slack.SlackAttachment
 
 	switch action.Actions[0].Name {
 	case "approve":
-		newAttch = SlackAttachment{
+		newAttch = slack.SlackAttachment{
 			Title:    "Approved",
 			Fallback: "Approved",
 			Color:    "good",
 		}
 	case "reject":
-		newAttch = SlackAttachment{
+		newAttch = slack.SlackAttachment{
 			Title:    "Rejected",
 			Fallback: "Rejected",
 			Color:    "danger",
@@ -119,7 +120,7 @@ func handleQaResponse(action SlackInteraction) {
 	updtMsg.Attachments = updtMsg.Attachments[:2]
 	updtMsg.Attachments = append(updtMsg.Attachments, newAttch)
 
-	_, err = sendSlack(updtMsg)
+	_, err = slack.sendSlack(updtMsg)
 	if err != nil {
 		log.Println(err)
 		return
@@ -127,14 +128,14 @@ func handleQaResponse(action SlackInteraction) {
 
 	// Create a new slack message and add it as a threaded
 	// reply to the Owner messages
-	var newM SlackMessage
+	var newM slack.SlackMessage
 	newM.Text = "<@" + user + "> has *" + newAttch.Title + "* this build"
 
 	for _, oM := range payload.OwnerMessages {
 		newM.ThreadTs = oM.Ts
 		newM.Channel = oM.Channel
 
-		_, err = sendSlack(newM)
+		_, err = slack.sendSlack(newM)
 		if err != nil {
 			log.Println(err)
 			continue
@@ -144,15 +145,15 @@ func handleQaResponse(action SlackInteraction) {
 	return
 }
 
-func handleOwnerDeploy(action SlackInteraction) {
+func handleOwnerDeploy(action slack.SlackInteraction) {
 
 	var errs []error
 
 	switch action.Actions[0].Name {
 	case "deploy":
-		errs = handleDeployToProd(action)
+		errs = slack.handleDeployToProd(action)
 	case "close":
-		errs = handleCloseDeployment(action)
+		errs = slack.handleCloseDeployment(action)
 	}
 
 	if len(errs) > 0 {
@@ -163,7 +164,7 @@ func handleOwnerDeploy(action SlackInteraction) {
 	return
 }
 
-func handleDeployToProd(action SlackInteraction) (errs []error) {
+func handleDeployToProd(action slack.SlackInteraction) (errs []error) {
 
 	var payload actionPayload
 	err := json.Unmarshal([]byte(action.Actions[0].Value), &payload)
@@ -172,12 +173,12 @@ func handleDeployToProd(action SlackInteraction) (errs []error) {
 		return
 	}
 
-	url, deployErr := deployToProd(payload.Build)
+	url, deployErr := slack.deployToProd(payload.Build)
 
 	if deployErr != nil {
 		errs = append(errs, deployErr)
 
-		failErr := sendFailedProdDeploy(payload, deployErr)
+		failErr := slack.sendFailedProdDeploy(payload, deployErr)
 		if failErr != nil {
 			errs = append(errs, failErr)
 		}
@@ -188,7 +189,7 @@ func handleDeployToProd(action SlackInteraction) (errs []error) {
 	updtMsg.Update = true
 	updtMsg.Attachments = updtMsg.Attachments[:3]
 	updtMsg.Attachments = append(updtMsg.Attachments,
-		SlackAttachment{
+		slack.SlackAttachment{
 			Title:    "Deployed to production",
 			Fallback: "Deployed to production",
 			Color:    "good",
@@ -199,14 +200,14 @@ func handleDeployToProd(action SlackInteraction) (errs []error) {
 		updtMsg.Channel = oM.Channel
 		updtMsg.Ts = oM.Ts
 
-		_, err = sendSlack(updtMsg)
+		_, err = slack.sendSlack(updtMsg)
 		if err != nil {
 			errs = append(errs, err)
 			continue
 		}
 	}
 
-	err = sendSuccessProdDeploy(payload, action.User["id"], url)
+	err = slack.sendSuccessProdDeploy(payload, action.User["id"], url)
 	if err != nil {
 		errs = append(errs, err)
 	}
@@ -214,7 +215,7 @@ func handleDeployToProd(action SlackInteraction) (errs []error) {
 	return
 }
 
-func handleCloseDeployment(action SlackInteraction) (errs []error) {
+func handleCloseDeployment(action slack.SlackInteraction) (errs []error) {
 
 	var payload actionPayload
 	err := json.Unmarshal([]byte(action.Actions[0].Value), &payload)
@@ -227,7 +228,7 @@ func handleCloseDeployment(action SlackInteraction) (errs []error) {
 	updateMessage.Update = true
 	updateMessage.Attachments = updateMessage.Attachments[:3]
 	updateMessage.Attachments = append(updateMessage.Attachments,
-		SlackAttachment{
+		slack.SlackAttachment{
 			Title:    "Closed",
 			Fallback: "Closed",
 			Color:    "danger",
@@ -238,7 +239,7 @@ func handleCloseDeployment(action SlackInteraction) (errs []error) {
 		updateMessage.Channel = oM.Channel
 		updateMessage.Ts = oM.Ts
 
-		_, err = sendSlack(updateMessage)
+		_, err = slack.sendSlack(updateMessage)
 		if err != nil {
 			errs = append(errs, err)
 			continue

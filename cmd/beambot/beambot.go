@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/leangeder/chatops2/pkg/server"
+	"github.com/leangeder/chatops2/pkg/server/middleware"
 	"github.com/spf13/viper"
-	"gitlab.com/Beamery/DevOps/beambot/pkg/server"
-	"gitlab.com/Beamery/DevOps/beambot/pkg/server/middleware"
 )
 
 func setupConfig() {

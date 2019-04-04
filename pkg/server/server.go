@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"gitlab.com/Beamery/DevOps/beambot/pkg/server/build"
-	"gitlab.com/Beamery/DevOps/beambot/pkg/server/router"
-	"gitlab.com/Beamery/DevOps/beambot/pkg/slack"
+	"github.com/leangeder/chatops2/pkg/server/build"
+	"github.com/leangeder/chatops2/pkg/server/router"
+	"github.com/leangeder/chatops2/pkg/slack"
 )
 
 type Server struct {

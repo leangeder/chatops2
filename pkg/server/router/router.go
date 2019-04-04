@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"gitlab.com/Beamery/DevOps/beambot/pkg/server/handler"
-	"gitlab.com/Beamery/DevOps/beambot/pkg/server/logger"
+	"github.com/leangeder/chatops2/pkg/server/handler"
+	"github.com/leangeder/chatops2/pkg/server/logger"
 )
 
 // Route type description
