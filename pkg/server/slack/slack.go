@@ -8,8 +8,6 @@ import (
 	"net"
 	"net/http"
 	"time"
-
-	"github.com/spf13/viper"
 )
 
 type SlackMessage struct {
@@ -22,7 +20,6 @@ type SlackMessage struct {
 	Update      bool              `json:"-"`
 	Ephemeral   bool              `json:"-"`
 }
-
 type SlackAttachment struct {
 	Title      string        `json:"title,omitempty"`
 	Fallback   string        `json:"fallback,omitempty"`
@@ -82,7 +79,7 @@ func sendSlack(message SlackMessage) (response []byte, err error) {
 		return
 	}
 
-	slackToken := viper.GetString("slackToken")
+	slackToken := "8xHj8hlGtjcDQPGuXE5YbTos" // viper.GetString("slackToken")
 	slackBytes := bytes.NewBuffer(slackMessage)
 
 	endpoint := "https://slack.com/api/chat.postMessage"

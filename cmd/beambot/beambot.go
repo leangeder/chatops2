@@ -5,24 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/leangeder/chatops2/pkg/server"
-	"github.com/leangeder/chatops2/pkg/server/middleware"
-	"github.com/spf13/viper"
+	"github.com/leangeder/chatops2/pkg/server/server"
 )
-
-func setupConfig() {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func init() {
-	setupConfig()
-}
 
 func main() {
 	// s := &server.Server{}
@@ -35,5 +19,6 @@ func main() {
 
 	// create router and start listen on port 8000
 	fmt.Println("listening on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", middleware.SetupGlobalMiddleware(s.Handlers)))
+	// log.Fatal(http.ListenAndServe(":8080", middleware.SetupGlobalMiddleware(s.Handlers)))
+	log.Fatal(http.ListenAndServe(":8080", s.Handlers))
 }

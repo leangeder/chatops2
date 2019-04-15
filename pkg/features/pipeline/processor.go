@@ -1,15 +1,14 @@
-package processor
+package pipeline
 
 import (
 	"encoding/json"
 	"log"
 
-	"github.com/leangeder/chatops2/pkg/server"
-	"github.com/leangeder/chatops2/pkg/slack"
+	"github.com/leangeder/chatops2/pkg/server/slack"
 )
 
 type actionPayload struct {
-	// Build         Build      `json:"build,omitempty"`
+	Build         Build      `json:"build,omitempty"`
 	OwnerMessages []ownerMsg `json:"owner_messages,omitempty"`
 }
 
@@ -19,19 +18,16 @@ type ownerMsg struct {
 	Channel string `json:"channel,omitempty"`
 }
 
-// func (s *server.Server) startProcessors() {
-// 	go s.buildProcessor()
-// 	go s.interactionProcessor()
-func startProcessors() {
-	go buildProcessor()
-	go interactionProcessor()
+func (p *pipeline) Processors() {
+	go p.buildProcessor()
+	go p.interactionProcessor()
 }
 
-func (s *server.Server) buildProcessor() {
-	for build := range s.Builds {
+func (p *pipeline) buildProcessor() {
+	for build := range p.Builds {
 		go func() {
 
-			ts, attemptErr := AttemptDeployMessage(build)
+			ts, attemptErr := sendAttemptDeployMessage(build)
 			if attemptErr != nil {
 				log.Println(attemptErr)
 				return
@@ -42,26 +38,26 @@ func (s *server.Server) buildProcessor() {
 			if deployErr != nil {
 				log.Println(deployErr)
 
-				failErr := FailedDeployMessage(build, ts, deployErr)
+				failErr := sendFailedDeployMessage(build, ts, deployErr)
 				if failErr != nil {
 					log.Println(failErr)
 				}
 				return
 			}
 
-			err := DeploySuccessMessage(build, ts, url)
+			err := sendDeploySuccessMessage(build, ts, url)
 			if err != nil {
 				log.Println(err)
 				return
 			}
 
-			payload, errs := OwnerMessages(build, url)
+			payload, errs := sendOwnerMessages(build, url)
 			if len(errs) > 0 {
 				log.Println(errs)
 				return
 			}
 
-			errs = QaMessages(build, url, payload)
+			errs = sendQaMessages(build, url, payload)
 			if len(errs) > 0 {
 				log.Println(errs)
 				return
@@ -71,8 +67,8 @@ func (s *server.Server) buildProcessor() {
 	}
 }
 
-func (s *server.Server) interactionProcessor() {
-	for interaction := range s.Interactions {
+func (p *pipeline) interactionProcessor() {
+	for interaction := range p.Interactions {
 		go func() {
 			switch interaction.CallbackID {
 			case "QA Response":
@@ -135,14 +131,14 @@ func handleQaResponse(action slack.SlackInteraction) {
 		newM.ThreadTs = oM.Ts
 		newM.Channel = oM.Channel
 
-		_, err = slack.sendSlack(newM)
+		_, err = sendSlack(newM)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 	}
 
-	return
+	return msg
 }
 
 func handleOwnerDeploy(action slack.SlackInteraction) {
@@ -151,9 +147,9 @@ func handleOwnerDeploy(action slack.SlackInteraction) {
 
 	switch action.Actions[0].Name {
 	case "deploy":
-		errs = slack.handleDeployToProd(action)
+		errs = handleDeployToProd(action)
 	case "close":
-		errs = slack.handleCloseDeployment(action)
+		errs = handleCloseDeployment(action)
 	}
 
 	if len(errs) > 0 {
@@ -173,12 +169,12 @@ func handleDeployToProd(action slack.SlackInteraction) (errs []error) {
 		return
 	}
 
-	url, deployErr := slack.deployToProd(payload.Build)
+	url, deployErr := deployToProd(payload.Build)
 
 	if deployErr != nil {
 		errs = append(errs, deployErr)
 
-		failErr := slack.sendFailedProdDeploy(payload, deployErr)
+		failErr := sendFailedProdDeploy(payload, deployErr)
 		if failErr != nil {
 			errs = append(errs, failErr)
 		}
@@ -200,14 +196,14 @@ func handleDeployToProd(action slack.SlackInteraction) (errs []error) {
 		updtMsg.Channel = oM.Channel
 		updtMsg.Ts = oM.Ts
 
-		_, err = slack.sendSlack(updtMsg)
+		_, err = sendSlack(updtMsg)
 		if err != nil {
 			errs = append(errs, err)
 			continue
 		}
 	}
 
-	err = slack.sendSuccessProdDeploy(payload, action.User["id"], url)
+	err = sendSuccessProdDeploy(payload, action.User["id"], url)
 	if err != nil {
 		errs = append(errs, err)
 	}
@@ -239,7 +235,7 @@ func handleCloseDeployment(action slack.SlackInteraction) (errs []error) {
 		updateMessage.Channel = oM.Channel
 		updateMessage.Ts = oM.Ts
 
-		_, err = slack.sendSlack(updateMessage)
+		_, err = sendSlack(updateMessage)
 		if err != nil {
 			errs = append(errs, err)
 			continue
