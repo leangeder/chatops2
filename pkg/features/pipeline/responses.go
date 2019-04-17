@@ -10,7 +10,7 @@ func sendSuccessProdDeploy(payload actionPayload, user, url string) (err error) 
 
 	project := payload.Build.Project
 
-	var newM SlackMessage
+	var newM slack.SlackMessage
 	newM.Channel = project.Channel
 	newM.Text = "New production deployment for project " + project.Name + " by <@" + user + ">"
 
@@ -38,8 +38,8 @@ func sendSuccessProdDeploy(payload actionPayload, user, url string) (err error) 
 		slack.SlackAttachment{
 			Fallback: "View project: " + url,
 			Color:    "good",
-			Actions: []SlackAction{
-				SlackAction{
+			Actions: []slack.SlackAction{
+				slack.SlackAction{
 					Type: "button",
 					Text: "View project",
 					URL:  url,
@@ -48,7 +48,7 @@ func sendSuccessProdDeploy(payload actionPayload, user, url string) (err error) 
 		},
 	}
 
-	_, err = slack.sendSlack(newM)
+	_, err = slack.SendSlack(newM)
 	return
 }
 
@@ -56,7 +56,7 @@ func sendFailedProdDeploy(payload actionPayload, deployErr error) (err error) {
 
 	project := payload.Build.Project
 
-	var newM SlackMessage
+	var newM slack.SlackMessage
 	newM.Channel = project.Channel
 	newM.Text = "Production deployment failed for project " + project.Name
 
@@ -89,14 +89,14 @@ func sendFailedProdDeploy(payload actionPayload, deployErr error) (err error) {
 		},
 	}
 
-	_, err = slack.sendSlack(newM)
+	_, err = slack.SendSlack(newM)
 	return
 }
 
 func sendAttemptDeployMessage(build Build) (ts string, err error) {
 	msg := getAttemptDeployMessage(build)
 
-	resp, err := slack.sendSlack(msg)
+	resp, err := slack.SendSlack(msg)
 	if err != nil {
 		return
 	}
@@ -109,7 +109,7 @@ func sendAttemptDeployMessage(build Build) (ts string, err error) {
 }
 
 func getAttemptDeployMessage(build Build) slack.SlackMessage {
-	return SlackMessage{
+	return slack.SlackMessage{
 		Channel: build.Project.Channel,
 		Text:    "New Build complete.\nAttempting deployment...",
 		Attachments: []slack.SlackAttachment{
@@ -147,7 +147,7 @@ func sendDeploySuccessMessage(build Build, ts, url string) (err error) {
 	msg.Update = true
 	msg.Ts = ts
 
-	_, err = slack.sendSlack(msg)
+	_, err = slack.SendSlack(msg)
 	return
 }
 
@@ -184,8 +184,8 @@ func getDeploySuccessMessage(build Build, url string) slack.SlackMessage {
 			slack.SlackAttachment{
 				Fallback: "View project: " + url,
 				Color:    "good",
-				Actions: []SlackAction{
-					SlackAction{
+				Actions: []slack.SlackAction{
+					slack.SlackAction{
 						Type: "button",
 						Text: "View project",
 						URL:  url,
@@ -201,12 +201,12 @@ func sendFailedDeployMessage(build Build, ts string, deployErr error) (err error
 	msg.Update = true
 	msg.Ts = ts
 
-	_, err = slack.sendSlack(msg)
+	_, err = slack.SendSlack(msg)
 	return
 }
 
 func getFailedDeployMessage(build Build, err error) slack.SlackMessage {
-	return SlackMessage{
+	return slack.SlackMessage{
 		Channel: build.Project.Channel,
 		Text:    "New Build complete.\nDeployment Failed :sob:",
 		Attachments: []slack.SlackAttachment{
@@ -258,7 +258,7 @@ func sendOwnerMessages(build Build, url string) (
 
 	for _, user := range build.Project.Owners {
 		successMessage.Channel = user
-		resp, err := slack.sendSlack(successMessage)
+		resp, err := slack.SendSlack(successMessage)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -290,7 +290,7 @@ func sendOwnerMessages(build Build, url string) (
 		OwnerMessage.Channel = oM.Channel
 		OwnerMessage.Ts = oM.Ts
 
-		_, err := slack.sendSlack(OwnerMessage)
+		_, err := slack.SendSlack(OwnerMessage)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -309,7 +309,7 @@ func getOwnerMessage(build Build, url string, payload actionPayload) (slack.Slac
 
 	qaTeamAttachment := getQaSlackAttachment(build)
 
-	message := SlackMessage{
+	message := slack.SlackMessage{
 		Text: "New Build complete.\nDeployment Successful! :sunglasses:",
 		Attachments: []slack.SlackAttachment{
 			slack.SlackAttachment{
@@ -340,8 +340,8 @@ func getOwnerMessage(build Build, url string, payload actionPayload) (slack.Slac
 			slack.SlackAttachment{
 				Fallback: "View project: " + url,
 				Color:    "good",
-				Actions: []SlackAction{
-					SlackAction{
+				Actions: []slack.SlackAction{
+					slack.SlackAction{
 						Type: "button",
 						Text: "View project",
 						URL:  url,
@@ -352,8 +352,8 @@ func getOwnerMessage(build Build, url string, payload actionPayload) (slack.Slac
 			slack.SlackAttachment{
 				Fallback:   "Deploy to Production.",
 				CallbackID: "Deploy Decision",
-				Actions: []SlackAction{
-					SlackAction{
+				Actions: []slack.SlackAction{
+					slack.SlackAction{
 						Type:  "button",
 						Text:  "Deploy to Production",
 						Name:  "deploy",
@@ -366,7 +366,7 @@ func getOwnerMessage(build Build, url string, payload actionPayload) (slack.Slac
 							"dismiss_text": "Cancel",
 						},
 					},
-					SlackAction{
+					slack.SlackAction{
 						Type:  "button",
 						Text:  "Close",
 						Name:  "close",
@@ -397,7 +397,7 @@ func sendQaMessages(build Build, url string, payload actionPayload) (errs []erro
 
 	for _, user := range build.Project.QA {
 		QAmsg.Channel = user
-		_, err := slack.sendSlack(QAmsg)
+		_, err := slack.SendSlack(QAmsg)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -445,8 +445,8 @@ func getQAMessage(build Build, url string, payload actionPayload) (slack.SlackMe
 			slack.SlackAttachment{
 				Fallback: "View project: " + url,
 				Color:    "good",
-				Actions: []SlackAction{
-					SlackAction{
+				Actions: []slack.SlackAction{
+					slack.SlackAction{
 						Type: "button",
 						Text: "View project",
 						URL:  url,
@@ -457,15 +457,15 @@ func getQAMessage(build Build, url string, payload actionPayload) (slack.SlackMe
 				Title:      "Kindly perform QA for this project.",
 				Fallback:   "Kindly perform QA for this project.",
 				CallbackID: "QA Response",
-				Actions: []SlackAction{
-					SlackAction{
+				Actions: []slack.SlackAction{
+					slack.SlackAction{
 						Type:  "button",
 						Text:  "Approve",
 						Name:  "approve",
 						Value: string(marshaledPayload),
 						Style: "primary",
 					},
-					SlackAction{
+					slack.SlackAction{
 						Type:  "button",
 						Text:  "Reject",
 						Name:  "reject",

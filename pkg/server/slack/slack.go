@@ -60,7 +60,7 @@ type SlackInteraction struct {
 
 // sendSlack() sends a slack message.
 // It expects that viper can find "slackToken" in the config file.
-func sendSlack(message SlackMessage) (response []byte, err error) {
+func SendSlack(message SlackMessage) (response []byte, err error) {
 
 	netTransport := &http.Transport{
 		Dial: (&net.Dialer{

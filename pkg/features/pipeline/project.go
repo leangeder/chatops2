@@ -1,6 +1,7 @@
 package pipeline
 
 type Project struct {
+	Name    string
 	ID      string
 	URL     string
 	Channel string
@@ -11,6 +12,7 @@ type Project struct {
 func (p *pipeline) LoadProject() {
 	var projects []Project
 	projects = append(projects, Project{
+		Name:    "api-core",
 		ID:      "beamery-trials",
 		URL:     "https://13.34.34.25",
 		Channel: "slack/dsd/deploy-trials",

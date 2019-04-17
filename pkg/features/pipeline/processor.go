@@ -116,7 +116,7 @@ func handleQaResponse(action slack.SlackInteraction) {
 	updtMsg.Attachments = updtMsg.Attachments[:2]
 	updtMsg.Attachments = append(updtMsg.Attachments, newAttch)
 
-	_, err = slack.sendSlack(updtMsg)
+	_, err = slack.SendSlack(updtMsg)
 	if err != nil {
 		log.Println(err)
 		return
@@ -131,14 +131,14 @@ func handleQaResponse(action slack.SlackInteraction) {
 		newM.ThreadTs = oM.Ts
 		newM.Channel = oM.Channel
 
-		_, err = sendSlack(newM)
+		_, err = slack.SendSlack(newM)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 	}
 
-	return msg
+	return
 }
 
 func handleOwnerDeploy(action slack.SlackInteraction) {
@@ -196,7 +196,7 @@ func handleDeployToProd(action slack.SlackInteraction) (errs []error) {
 		updtMsg.Channel = oM.Channel
 		updtMsg.Ts = oM.Ts
 
-		_, err = sendSlack(updtMsg)
+		_, err = slack.SendSlack(updtMsg)
 		if err != nil {
 			errs = append(errs, err)
 			continue
@@ -235,7 +235,7 @@ func handleCloseDeployment(action slack.SlackInteraction) (errs []error) {
 		updateMessage.Channel = oM.Channel
 		updateMessage.Ts = oM.Ts
 
-		_, err = sendSlack(updateMessage)
+		_, err = slack.SendSlack(updateMessage)
 		if err != nil {
 			errs = append(errs, err)
 			continue
