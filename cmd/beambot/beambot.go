@@ -15,10 +15,13 @@ func main() {
 	// s.Interactions = make(chan slack.SlackInteraction, 5)
 	// // s.Projects = make(map[string]project.Project)
 	// s.Handlers = router.NewRouterV1()
-	s := server.Run()
+	s, err := server.Run()
+	if err != nil {
+		panic(err)
+	}
 
 	// create router and start listen on port 8000
 	fmt.Println("listening on port 8080")
 	// log.Fatal(http.ListenAndServe(":8080", middleware.SetupGlobalMiddleware(s.Handlers)))
-	log.Fatal(http.ListenAndServe(":8080", s.Handlers))
+	log.Fatal(http.ListenAndServe(":8080", s.Router))
 }

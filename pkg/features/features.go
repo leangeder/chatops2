@@ -4,14 +4,21 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/leangeder/chatops2/pkg/features/kubernetes"
 	"github.com/leangeder/chatops2/pkg/features/pipeline"
-	"github.com/leangeder/chatops2/pkg/server/logger"
 )
 
-func NewRouters() *mux.Router {
-	router := mux.NewRouter().StrictSlash(true)
-	router.Use(logger.Logger)
-	sub := router.PathPrefix("/v1").Subrouter()
-	pipeline.Start(sub)
-	kubernetes.Start(sub)
-	return router
+type Features struct {
+	Router *mux.Router
+	test   map[string]interface{}
+}
+
+func LoadFeatures(r *mux.Router) error {
+	s := &Features{Router: r.PathPrefix("/v1").Subrouter()}
+	s.loadHandlers()
+	return nil
+}
+
+func (f *Features) loadHandlers() error {
+	pipeline.Start(f.Router)
+	kubernetes.Start(f.Router)
+	return nil
 }

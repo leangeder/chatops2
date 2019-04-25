@@ -149,8 +149,8 @@
     "helper/strutil",
   ]
   pruneopts = "UT"
-  revision = "a3dcd63451cf6da1d04928b601bbe9748d53842e"
-  version = "v1.1.1"
+  revision = "0082501623c0b704b87b1fbc84c2d725994bac54"
+  version = "v1.1.2"
 
 [[projects]]
   digest = "1:a0cefd27d12712af4b5018dc7046f245e1e3b5760e2e848c30b171b570708f9b"
@@ -201,15 +201,15 @@
   version = "1.0.1"
 
 [[projects]]
-  digest = "1:d886a3c32c8c1a770d07e36340f061d3afc948d065ffc3c9a19b01b34d4f0b65"
+  digest = "1:cf9272ab0a637cb1ffa40e2b6220108d7016a36b3eb357e4b57aacb7a8f725c0"
   name = "github.com/pierrec/lz4"
   packages = [
     ".",
     "internal/xxh32",
   ]
   pruneopts = "UT"
-  revision = "315a67e90e415bcdaff33057da191569bf4d8479"
-  version = "v2.1.1"
+  revision = "9419d2361c8ae111073ffe3337ecc364fb590921"
+  version = "v2.1.2"
 
 [[projects]]
   digest = "1:6baa565fe16f8657cf93469b2b8a6c61a277827734400d27e44d589547297279"
@@ -233,11 +233,11 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   pruneopts = "UT"
-  revision = "88737f569e3a9c7ab309cdc09a07fe7fc87233c3"
+  revision = "df01cb2cc480549d72034218dd98bf97671450ac"
 
 [[projects]]
   branch = "master"
-  digest = "1:c745644c88df7496196bf316dd0e813f1908215ff29e96622c2fc194f21bac0c"
+  digest = "1:8a320ae827e62b4afafc65a60d23382db2bf82327129b4678382b9ebad0941d1"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -248,7 +248,7 @@
     "idna",
   ]
   pruneopts = "UT"
-  revision = "eb5bcb51f2a31c7d5141d810b70815c05d9c9146"
+  revision = "afa5a82059c6356159f699d81beff22a81842231"
 
 [[projects]]
   branch = "master"
@@ -263,14 +263,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1057f217b8dc6524b1c44809fface8db9efdd7ed87f65c26c0b9ba21c50a54b8"
+  digest = "1:a29b488ff122fd8033d43c7cfcc5a0f5b2b1faf5256e8b3bd1568c451f8c6b64"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "UT"
-  revision = "97732733099d6a942a73b889770774366de963ed"
+  revision = "e8e3143a4f4a00f1fafef0dd82ba78223281b01b"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -337,7 +337,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:01f2e3750b78f0f458cb6f8d12993a1b0ac8e61a92057fe78caa8ed36cf2f7c7"
+  digest = "1:08f27db4a5192ae419db7d6fb2c402c7faf3605ef3fb30c0976bdb34ee196947"
   name = "k8s.io/api"
   packages = [
     "admissionregistration/v1beta1",
@@ -378,11 +378,10 @@
     "storage/v1beta1",
   ]
   pruneopts = "UT"
-  revision = "3cc1b3fb6d0fed067d7ce09404ebe97514e1824a"
+  revision = "c5cad27821f602a806fbc313abf36f20aec596de"
 
 [[projects]]
-  branch = "master"
-  digest = "1:99554fae1634323dbadb38f1d538acba178f7462ac8be78f58990e18e8531156"
+  digest = "1:78f6a824d205c6cb0d011cce241407646b773cb57ee27e8c7e027753b4111075"
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/api/errors",
@@ -422,7 +421,8 @@
     "third_party/forked/golang/reflect",
   ]
   pruneopts = "UT"
-  revision = "40a3f73b0fa250217add10fcf58812c827a5bb48"
+  revision = "d7deff9243b165ee192f5551710ea4285dcfd615"
+  version = "kubernetes-1.14.0"
 
 [[projects]]
   digest = "1:49350e3456577f754e365ec213a486cff158622a06f6117a825222db8a1ce2c4"
@@ -522,10 +522,7 @@
   input-imports = [
     "github.com/gorilla/mux",
     "github.com/hashicorp/vault/api",
-    "k8s.io/api/apps/v1",
-    "k8s.io/api/core/v1",
     "k8s.io/apimachinery/pkg/api/errors",
-    "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/util/intstr",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/tools/clientcmd",

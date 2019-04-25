@@ -19,12 +19,9 @@ func (p *pipeline) BuildComplete(w http.ResponseWriter, r *http.Request) {
 
 	build := Build{}
 	build.Project = project
-	// build.Image = r.FormValue("image")   //docker image
-	// build.Target = r.FormValue("target") // name of the branch or tag
-	// build.Type = r.FormValue("type")     // branch or tag
-	build.Image = "test"
-	build.Target = "toto"
-	build.Type = "tata"
+	build.Image = r.FormValue("image")   //docker image
+	build.Target = r.FormValue("target") // name of the branch or tag
+	build.Type = r.FormValue("type")     // branch or tag
 
 	p.Builds <- build
 	w.Write([]byte("Received successfully"))

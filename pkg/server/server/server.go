@@ -3,17 +3,18 @@ package server
 import (
 	"github.com/gorilla/mux"
 	"github.com/leangeder/chatops2/pkg/features"
+	"github.com/leangeder/chatops2/pkg/server/logger"
 )
 
-type Server struct {
-	Handlers *mux.Router
+type server struct {
+	Router *mux.Router
 }
 
-func Run() *Server {
-	s := new(Server)
+func Run() (*server, error) {
+	s := &server{}
+	s.Router = mux.NewRouter().StrictSlash(true)
+	s.Router.Use(logger.Logger)
+	features.LoadFeatures(s.Router)
 
-	s.Handlers = features.NewRouters()
-	// s.Handlers = router.NewRouterV1()
-
-	return s
+	return s, nil
 }

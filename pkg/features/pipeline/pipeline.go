@@ -19,6 +19,7 @@ type Build struct {
 }
 
 func Start(r *mux.Router) {
+
 	p := &pipeline{}
 	p.Builds = make(chan Build, 5)
 	p.Interactions = make(chan slack.SlackInteraction, 5)
