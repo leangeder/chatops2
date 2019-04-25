@@ -1,0 +1,5 @@
+vendor/
+.git/
+k8s/
+README.md
+Dockerfile
