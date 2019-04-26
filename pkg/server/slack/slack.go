@@ -79,7 +79,8 @@ func SendSlack(message SlackMessage) (response []byte, err error) {
 		return
 	}
 
-	slackToken := "8xHj8hlGtjcDQPGuXE5YbTos" // viper.GetString("slackToken")
+	slackToken := "xoxb-451023708149-607702376210-ENMotH7reaD5soxJqoG2WBRH" // viper.GetString("slackToken")
+	// slackToken := "8xHj8hlGtjcDQPGuXE5YbTos" // viper.GetString("slackToken")
 	slackBytes := bytes.NewBuffer(slackMessage)
 
 	endpoint := "https://slack.com/api/chat.postMessage"

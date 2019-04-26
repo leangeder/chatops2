@@ -3,6 +3,7 @@ package logger
 import (
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -29,19 +30,22 @@ func Logger(inner http.Handler) http.Handler {
 		start := time.Now()
 		wrapper := ResponseWriterWrapper(w)
 		inner.ServeHTTP(wrapper, r)
-		// 127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 286.219µs
-		log.Printf("%s %s %s [%v] \"%s %s %s\" %d %d \"%s\" %s",
-			r.RemoteAddr,
-			"-",
-			"-",
-			start,
-			r.Method,
-			r.RequestURI,
-			r.Proto, // string "HTTP/1.1"
-			wrapper.statusCode,
-			r.ContentLength,
-			r.Header["User-Agent"],
-			time.Since(start),
-		)
+
+		// if ip, _, _ := net.SplitHostPort(r.RemoteAddr); ip != os.Getenv("POD_IP") {
+		if !strings.Contains(r.Header["User-Agent"][0], "kube-probe") {
+			log.Printf("%s %s %s [%v] \"%s %s %s\" %d %d \"%s\" %s",
+				r.RemoteAddr,
+				"-",
+				"-",
+				start,
+				r.Method,
+				r.RequestURI,
+				r.Proto, // string "HTTP/1.1"
+				wrapper.statusCode,
+				r.ContentLength,
+				r.Header["User-Agent"],
+				time.Since(start),
+			)
+		}
 	})
 }

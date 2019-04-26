@@ -18,25 +18,30 @@ spec:
     spec:
       containers:
       - name: chatops2
-        image: {{.esimage}}
-        imagePullPolicy: IfNotPresent
+        image: leangeder/chatbot:latest
+        imagePullPolicy: Always
+        # imagePullPolicy: IfNotPresent
         livenessProbe:
           tcpSocket:
             port: http
-          initialDelaySeconds: 20
+          initialDelaySeconds: 1
         readinessProbe:
           httpGet:
-            scheme: HTTPS
+            scheme: HTTP
             path: /metrics
             port: http
-          initialDelaySeconds: 20
+          initialDelaySeconds: 5
           timeoutSeconds: 5
           # resources:
           #   requests:
           #     memory: "{{.esclient.memory}}"
           #   limits:
           #     memory: "{{.esclient.memory}}"
-          # env:
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
           # - name: NAMESPACE
           #   valueFrom:
           #     fieldRef:
@@ -46,8 +51,8 @@ spec:
           #     fieldRef:
           #       fieldPath: metadata.name
         ports:
-        - containerPort: 8080
-          name: http
+        - name: http
+          containerPort: 8080
       #   volumeMounts:
       #   - name: elasticconfig
       #     mountPath: /elasticsearch/config/log4j2.properties

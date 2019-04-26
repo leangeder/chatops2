@@ -2,28 +2,16 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: cerebro
-  namespace: {{.namespace}}
-  annotations:
-    kubernetes.io/ingress.global-static-ip-name: beamery-cerebro-ip
-    kubernetes.io/ingress.allow-http: "false"
+  name: chatops2
   labels:
-    app: cerebro
-    component: elasticsearch
-    role: tool
+    app: chatops2
+    component: chatops2
+    role: services
 spec:
-  tls:
-  - secretName: support-tls
   rules:
-  - host: cerebro.support.beamery.com
+  - host: chat.leangeder.eu
     http:
       paths:
       - backend:
-          serviceName: cerebro-ro
-          servicePort: http
-  - host: cerebro.admin.beamery.com
-    http:
-      paths:
-      - backend:
-          serviceName: cerebro-rw
+          serviceName: chatops2
           servicePort: http

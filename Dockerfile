@@ -5,8 +5,8 @@ FROM golang:1.11 as builder
 LABEL maintainer="BULGARE Gregory <gregory@beamery.com>"
 
 # install xz
-RUN apt-get update && apt-get install -y \
-    xz-utils \
+RUN apt update \
+    && apt install -y xz-utils ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # install UPX
@@ -39,6 +39,7 @@ WORKDIR /root
 
 # copy the binary from builder
 COPY --from=builder /go/bin/chatops2 .
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 EXPOSE 8080
 
